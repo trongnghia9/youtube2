@@ -1,0 +1,782 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --first-color: #252525;
+    --second-color: #8d9192;
+    --third-color: #28809a;
+    --fourth-color: #ededed;
+    --fifth-color: #ffffff;
+
+    --six-color: #111111;
+    --seven-color: #1a2d42;
+    --eight-color: #d4d8dd;
+    --nine-color: #f7f7f7;
+  }
+
+  [data-theme="light"] {
+    --scrollbar-color: var(--second-color);
+
+    --background-first-color: var(--nine-color);
+    --background-second-color: linear-gradient(
+      to top,
+      var(--fifth-color),
+      var(--third-color)
+    );
+    --background-third-color: var(--fifth-color);
+    --background-fourth-color: var(--fourth-color);
+    --text-first-color: var(--first-color);
+    --text-second-color: var(--second-color);
+    --text-third-color: linear-gradient(
+      to right,
+      var(--first-color),
+      var(--fifth-color)
+    );
+    --text-fourth-color: linear-gradient(
+      to right,
+      var(--first-color),
+      var(--second-color)
+    );
+    --border-color: var(--fifth-color);
+    --border-hover-color: var(--first-color);
+    --header-navbar-footer-first: var(--fourth-color);
+    --header-navbar-footer-second: var(--third-color);
+
+    /* Button */
+    --button-bg-first: var(--third-color);
+    --button-bg-second: linear-gradient(
+      to right,
+      var(--fourth-color),
+      var(--third-color)
+    );
+    --button-bg-third: linear-gradient(
+      to left,
+      var(--fourth-color),
+      var(--third-color)
+    );
+    --button-bg-active: linear-gradient(
+      to right,
+      var(--fifth-color),
+      var(--third-color)
+    );
+    --button-text-first: var(--fourth-color);
+    --button-text-second: var(--first-color);
+    --button-icon: var(--fifth-color);
+    --button-border-first: var(--third-color);
+    --button-border-second: var(--fifth-color);
+    --button-border-third: var(--fourth-color);
+    --button-hover-bg-first: linear-gradient(
+      to right,
+      var(--third-color),
+      var(--fourth-color)
+    );
+    --button-hover-bg-second: linear-gradient(
+      to left,
+      var(--third-color),
+      var(--fourth-color)
+    );
+    --button-hover-text: var(--first-color);
+    --button-hover-icon: var(--fourth-color);
+    --button-hover-border: var(--first-color);
+
+    /* Table */
+    --table-header: var(--eight-color);
+    --table-bg: var(--fifth-color);
+    --table-text: var(--first-color);
+    --table-border: var(--second-color);
+
+    /* Form */
+    --form-bg: var(--fifth-color);
+    --form-text: var(--first-color);
+    --form-border: var(--second-color);
+    --form-placeholder: var(--second-color);
+
+    /* Card */
+    --card-bg-first: linear-gradient(
+      to top,
+      var(--fourth-color),
+      var(--second-color)
+    );
+    --card-bg-second: linear-gradient(
+      to top,
+      var(--fourth-color),
+      var(--fifth-color)
+    );
+    --card-text: var(--first-color);
+    --card-border: var(--second-color);
+
+    /* Hover */
+    --hover-bg-first: var(--fourth-color);
+    --hover-bg-second: var(--fourth-color);
+    --hover-text: var(--first-color);
+    --hover-border: var(--first-color);
+  }
+
+  [data-theme="dark"] {
+    --scrollbar-color: var(--fourth-color);
+
+    --background-first-color: var(--first-color);
+    --background-second-color: linear-gradient(
+      to top,
+      var(--first-color),
+      var(--second-color)
+    );
+    --background-third-color: var(--six-color);
+    --background-fourth-color: var(--first-color);
+    --text-first-color: var(--fourth-color);
+    --text-second-color: var(--fifth-color);
+    --text-third-color: linear-gradient(
+      to right,
+      var(--fifth-color),
+      var(--second-color)
+    );
+    --text-fourth-color: linear-gradient(
+      to right,
+      var(--second-color),
+      var(--fifth-color)
+    );
+    --border-color: var(--second-color);
+    --border-hover-color: var(--fifth-color);
+    --header-navbar-footer-first: var(--first-color);
+    --header-navbar-footer-second: var(--second-color);
+
+    /* Button */
+    --button-bg-first: var(--third-color);
+    --button-bg-second: linear-gradient(
+      to right,
+      var(--second-color),
+      var(--third-color)
+    );
+    --button-bg-third: linear-gradient(
+      to left,
+      var(--second-color),
+      var(--third-color)
+    );
+    --button-bg-active: linear-gradient(
+      to right,
+      var(--first-color),
+      var(--third-color)
+    );
+    --button-text: var(--fifth-color);
+    --button-icon: var(--fourth-color);
+    --button-border-first: var(--third-color);
+    --button-border-second: var(--second-color);
+    --button-border-third: var(--second-color);
+    --button-hover-bg-first: linear-gradient(
+      to right,
+      var(--third-color),
+      var(--first-color)
+    );
+    --button-hover-bg-second: linear-gradient(
+      to left,
+      var(--third-color),
+      var(--first-color)
+    );
+    --button-hover-text: var(--fourth-color);
+    --button-hover-icon: var(--fifth-color);
+    --button-hover-border: var(--fourth-color);
+
+    /* Table */
+    --table-header: var(--seven-color);
+    --table-bg: var(--first-color);
+    --table-text: var(--fourth-color);
+    --table-border: var(--second-color);
+
+    /* Form */
+    --form-bg: var(--first-color);
+    --form-text: var(--fourth-color);
+    --form-border: var(--second-color);
+    --form-placeholder: var(--second-color);
+
+    /* Card */
+    --card-bg-first: linear-gradient(
+      to top,
+      var(--first-color),
+      var(--second-color)
+    );
+    --card-bg-second: linear-gradient(
+      to bottom,
+      var(--first-color),
+      var(--second-color)
+    );
+    --card-text: var(--fifth-color);
+    --card-border: var(--second-color);
+
+    /* Hover */
+    --hover-bg-first: var(--second-color);
+    --hover-bg-second: var(--first-color);
+    --hover-text: var(--fifth-color);
+    --hover-border: var(--fifth-color);
+  }
+
+  body {
+    @apply m-0 p-0 box-border;
+    background-color: var(--background-color);
+    color: var(--text-color);
+  }
+
+  body::-webkit-scrollbar {
+    background-color: var(--background-first-color);
+    width: 8px;
+  }
+
+  body::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-color);
+    border-radius: 35px;
+  }
+}
+
+@layer components {
+  .theme-first {
+    background-color: var(--background-first-color);
+    color: var(--text-first-color);
+    border-color: var(--border-color);
+  }
+
+  .theme-second {
+    background: var(--background-second-color);
+    color: var(--text-second-color);
+    border: var(--border-color);
+  }
+
+  .theme-third {
+    background-color: var(--background-fourth-color);
+    color: var(--text-first-color);
+    border-color: var(--border-color);
+  }
+
+  .theme-header-first {
+    background-color: var(--header-navbar-footer-first);
+    color: var(--text-first-color);
+    border-color: var(--border-color);
+  }
+
+  .theme-header-second {
+    background: var(--header-navbar-footer-second);
+    color: var(--text-first-color);
+    border-color: var(--border-color);
+  }
+
+  .theme-header-third {
+    background-color: var(--background-third-color);
+    color: var(--text-first-color);
+    border-color: var(--border-color);
+  }
+
+  .theme-active {
+    background: var(--button-bg-active);
+    color: var(--button-text);
+    border-color: var(--button-border-second);
+    position: relative;
+    z-index: 1;
+  }
+
+  .theme-active::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--button-hover-bg-first);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    z-index: -1;
+  }
+
+  .theme-active:hover::before {
+    opacity: 1;
+  }
+
+  .theme-active:hover {
+    color: var(--button-hover-text);
+    border-color: var(--button-hover-border);
+  }
+
+  .theme-hover {
+    background: var(--background-third-color);
+    color: var(--text-first-color);
+    transition: all 0.3s ease-in-out;
+  }
+
+  .theme-hover:hover {
+    background: var(--hover-bg-second);
+    color: var(--hover-text);
+  }
+
+  /* Footer */
+  .theme-footer {
+    background-color: var(--header-navbar-footer-first);
+    color: var(--text-first-color);
+    border-color: var(--border-color);
+  }
+
+  .text-footer {
+    @apply duration-500;
+    color: var(--text-first-color);
+  }
+
+  .text-footer:hover {
+    color: var(--text-second-color);
+  }
+
+  .icon-footer {
+    @apply duration-500;
+    color: var(--button-text);
+  }
+
+  .icon-footer:hover {
+    color: var(--text-second-color);
+  }
+
+  /* Text */
+  .theme-text-first {
+    color: var(--text-first-color);
+  }
+
+  .theme-text-second {
+    color: var(--text-second-color);
+  }
+
+  .theme-text-third {
+    background: var(--text-third-color);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .theme-text-fourth {
+    background: var(--text-fourth-color);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .theme-bg-first {
+    background-color: var(--background-first-color);
+  }
+
+  .theme-bg-second {
+    background: var(--background-second-color);
+  }
+
+  .theme-border {
+    border-color: var(--border-color);
+    transition: all 0.5s ease-in-out;
+  }
+
+  .theme-border:hover {
+    border-color: var(--border-hover-color);
+  }
+
+  .theme-card-first {
+    background: var(--card-bg-first);
+    color: var(--card-text);
+    border-color: var(--card-border);
+  }
+
+  .theme-card-second {
+    background: var(--card-bg-second);
+    color: var(--card-text);
+    border-color: var(--card-border);
+  }
+
+  /* Button 1 */
+  .btn-1 {
+    @apply relative overflow-hidden font-medium px-5 py-2.5 rounded-md border-solid border-1.5;
+    background-color: var(--button-bg-first);
+    color: var(--button-text-first);
+    border-color: var(--button-border-first);
+    position: relative;
+    z-index: 1; /* Giữ text và border phía trên */
+  }
+
+  .btn-1::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--button-hover-bg-first);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    z-index: -1; /* Đặt lớp phủ phía dưới */
+  }
+
+  .btn-1:hover::before {
+    opacity: 1;
+  }
+
+  .btn-1:hover {
+    color: var(--button-hover-text);
+    border-color: var(--button-hover-border);
+  }
+
+  /* Button 2 */
+  .btn-2 {
+    @apply relative overflow-hidden font-medium px-5 py-2.5 rounded-md border-solid border-1.5;
+    color: var(--button-text-second);
+    border-color: var(--button-border-second);
+    position: relative;
+    z-index: 1;
+  }
+
+  .btn-2::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--button-hover-bg-first);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    z-index: -1;
+  }
+
+  .btn-2:hover::before {
+    opacity: 1;
+  }
+
+  .btn-2:hover {
+    color: var(--button-hover-text);
+    border-color: var(--button-hover-border);
+  }
+
+  /* Button 3 */
+  .btn-3 {
+    @apply font-medium px-5 py-2.5 underline duration-500;
+    color: var(--button-text-second);
+  }
+
+  .btn-3:hover {
+    color: var(--button-hover-text);
+  }
+
+  /* Button-icon */
+  /* .btn-icon {
+    @apply flex font-medium px-4 py-2 rounded-md duration-500;
+    background-color: var(--button-bg-first);
+    color:var(--button-text);
+    border-color: var(--button-border-first);
+  }
+
+  .btn-icon:hover {
+    color: var(--button-hover-icon);
+    border-color: var(--button-hover-border);
+  } */
+
+  .btn-event__1 {
+    @apply rounded-full p-1.5 duration-500 ease-in-out;
+    background-color: var(--button-bg-first);
+    color: var(--button-icon);
+  }
+
+  .btn-event__1:hover {
+    background: var(--button-hover-bg-first);
+    color: var(--button-hover-icon);
+  }
+
+  .btn-event__2 {
+    @apply flex font-medium border-solid border-0.25 px-4 py-2 rounded-s-2xl duration-300;
+    background: var(--button-bg-second);
+    color: var(--button-icon);
+    border-color: var(--button-border-first);
+  }
+
+  .btn-event__2:hover {
+    background: var(--button-hover-bg-first);
+    color: var(--button-hover-icon);
+    border-color: var(--button-hover-border);
+  }
+
+  .btn-event__3 {
+    @apply flex font-medium border-solid border px-4 py-2 rounded-e-2xl duration-300;
+    background: var(--button-bg-third);
+    color: var(--button-icon);
+    border-color: var(--button-border-first);
+  }
+
+  .btn-event__3:hover {
+    background: var(--button-hover-bg-second);
+    color: var(--button-hover-icon);
+    border-color: var(--button-hover-border);
+  }
+
+  .btn-event__4 {
+    @apply flex items-center gap-1 border border-solid px-2 py-1 rounded-lg duration-500 ease-in-out;
+    background-color: var(--button-bg-first);
+    color: var(--button-icon);
+    border-color: var(--button-border-third);
+  }
+
+  .btn-event__4:hover {
+    background: var(--button-hover-bg-first);
+    color: var(--button-hover-icon);
+    border-color: var(--button-hover-border);
+  }
+
+  .icon-setting {
+    @apply size-6 duration-500 rounded-full p-1 mr-1;
+    background-color: var(--button-bg-first);
+    color: var(--button-icon);
+  }
+
+  .icon-setting:hover {
+    background: var(--button-bg-third);
+    color: var(--button-hover-icon);
+  }
+
+  .form-input {
+    @apply py-2 px-3 rounded-lg border-0.5 focus:outline-none focus-visible:border-0.5 focus-visible:duration-500;
+    background-color: var(--form-bg);
+    color: var(--form-text);
+    border-color: var(--form-border);
+  }
+
+  .form-input::placeholder {
+    color: var(--form-placeholder);
+  }
+
+  .form-edit {
+    @apply overflow-hidden resize-none bg-transparent w-full rounded text-sm placeholder-transparent px-3.5 py-1 ring-1 focus:outline-none transition-all duration-200;
+    color: var(--form-text);
+  }
+
+  .label-edit {
+    @apply absolute cursor-text left-0 -top-2.5 text-xs mx-2 px-1 transition-all duration-100 ease-in-out;
+  }
+
+  .bg-gradient-first {
+  }
+
+  .bg-gradient-second {
+    background: var(--card-bg-second);
+  }
+
+  .avatar {
+    @apply size-12 rounded-full border-4 border-double hover:border-2 hover:border-solid hover:scale-105 duration-200 ease-in-out shadow-md;
+    border-color: var(--fourth-color);
+  }
+
+  /* .custom-select {
+    width: 200px;
+    border-radius: 8px;
+    background-color: var(--first-color) !important;
+    color: var(--fifth-color) !important;
+    border: 1.5px solid var(--fifth-color) !important;
+    padding: 5px 10px;
+  } */
+
+  /* Chỉnh màu nền cho toàn bộ Modal */
+  .custom-modal-dark .ant-modal-content {
+    background: var(--fifth-color) !important;
+    color: var(--first-color) !important;
+  }
+
+  /* Chỉnh màu nền cho Header */
+  .custom-modal-dark .ant-modal-header {
+    background: var(--fifth-color) !important;
+    border-bottom: 1px solid var(--first-color) !important;
+  }
+
+  /* Style cho footer của modal */
+  .custom-modal-dark .ant-modal-footer {
+    background: var(--fifth-color) !important;
+    border-top: 1px solid var(--first-color) !important;
+    padding-top: 1rem !important;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
+
+  /* Nút Cancel */
+  .custom-modal-dark .ant-btn-default {
+    background-color: transparent !important;
+    color: var(--first-color) !important;
+    border: 1px solid var(--first-color) !important;
+    border-radius: 0.5rem !important;
+    padding: 6px 1rem !important;
+    font-weight: 600;
+    transition: all 0.3s ease-in-out;
+  }
+
+  /* Hover cho Cancel */
+  .custom-modal-dark .ant-btn-default:hover {
+    background-color: var(--first-color) !important;
+    border-color: var(--fifth-color) !important;
+    color: var(--fifth-color) !important;
+  }
+
+  /* Nút OK */
+  .custom-modal-dark .ant-btn-primary {
+    background-color: var(--fourth-color) !important;
+    border: 1px solid var(--first-color) !important;
+    color: var(--first-color) !important;
+    border-radius: 0.5rem !important;
+    padding: 6px 1rem !important;
+    font-weight: 600;
+    transition: all 0.3s ease-in-out;
+  }
+
+  /* Hover cho OK */
+  .custom-modal-dark .ant-btn-primary:hover {
+    background-color: var(--second-color) !important;
+    border-color: var(--fifth-color) !important;
+    color: var(--fifth-color) !important;
+  }
+
+  .custom-table {
+    @apply shadow transition-all;
+  }
+
+  .custom-table .ant-table {
+    background-color: transparent !important;
+  }
+
+  /* .custom-table .ant-table-cell-fix-left,
+  .custom-table .ant-table-cell-fix-right {
+    background-color: white !important;
+    color: black !important;
+    opacity: 0.95;
+  }
+
+  [data-theme="dark"] .custom-table .ant-table-cell-fix-left,
+  [data-theme="dark"] .custom-table .ant-table-cell-fix-right {
+    background-color: black !important;
+    color: white !important;
+    opacity: 0.95;
+  } */
+
+  .custom-table .ant-table-selection-column {
+    background-color: var(--table-bg) !important;
+  }
+
+  [data-theme="dark"] .custom-table .ant-table-selection-column {
+    background-color: var(--table-bg) !important;
+  }
+
+  .custom-table .ant-table-thead .ant-table-selection-column {
+    background: var(--table-header) !important;
+  }
+
+  /* .custom-table .ant-table-row-selected .ant-table-selection-column {
+    background: #1a2d42 !important;
+  } */
+
+  .selected-row {
+    opacity: 0.65;
+    transition: opacity 0.3s ease-in-out;
+  }
+
+  /* PopConfirm */
+  .custom-popconfirm .ant-popconfirm-buttons {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+  }
+
+  .custom-popconfirm .ant-btn-default {
+    background-color: var(--first-color) !important;
+    color: var(--fifth-color) !important;
+    /* border: 1px solid var(--fifth-color) !important; */
+    /* border-radius: 0.25rem !important; */
+    padding: 0.25rem 0.5rem !important;
+    font-weight: 600;
+    transition: all 0.3s ease-in-out;
+  }
+
+  .custom-popconfirm .ant-btn-default:hover {
+    background-color: var(--fifth-color) !important;
+    border-color: var(--first-color) !important;
+    color: var(--first-color) !important;
+    opacity: 0.85;
+    transition: all 0.3s ease-in-out;
+  }
+
+  .custom-popconfirm .ant-btn-primary {
+    background-color: var(--fourth-color) !important;
+    border: 1px solid var(--first-color) !important;
+    color: var(--first-color) !important;
+    border-radius: 0.25rem !important;
+    padding: 0.25rem 0.5rem !important;
+    font-weight: 600;
+    transition: all 0.3s ease-in-out;
+  }
+
+  .custom-popconfirm .ant-btn-primary:hover {
+    opacity: 0.75;
+    transition: all 0.3s ease-in-out;
+  }
+
+  /* Scrollbar Ant-Design */
+  .custom-drawer .ant-drawer-body::-webkit-scrollbar {
+    background-color: var(--background-first-color) !important;
+    width: 4px !important;
+  }
+
+  .custom-drawer .ant-drawer-body::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-color) !important;
+    border-radius: 35px;
+  }
+
+  /* Scrollbar Body-Sidebar */
+  .body-sidebar::-webkit-scrollbar {
+    background-color: var(--background-first-color) !important;
+    width: 6px !important;
+  }
+
+  .body-sidebar::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-color) !important;
+    border-radius: 35px;
+  }
+
+  /* Scrollbar Content-Sidebar */
+  .content-sidebar::-webkit-scrollbar {
+    background-color: var(--background-first-color) !important;
+    width: 4.5px !important;
+  }
+
+  .content-sidebar::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-color) !important;
+    border-radius: 35px;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    background: white;
+    border-radius: 9999px;
+    height: 14px;
+    width: 14px;
+    margin-top: -5px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+  input[type="range"]::-webkit-slider-runnable-track {
+    background: #9ca3af; /* gray-400 */
+    height: 4px;
+    border-radius: 9999px;
+  }
+
+  /* Scrollbar Content-Modal */
+  .tab-video-suggestion {
+    .ant-tabs-nav {
+      width: 95%;
+      margin: 0.25rem auto 0;
+      .ant-tabs-nav-list {
+        width: 100%;
+        .ant-tabs-tab {
+          @apply m-0 w-1/3 flex items-center justify-center gap-1 border-b-1.5 py-2 px-4;
+          color: var(--text-first-color);
+          border-bottom: 2px solid var(--border-color);
+          &:hover {
+            color: var(--text-second-color);
+          }
+        }
+        .ant-tabs-tab:nth-child(2) {
+          border-bottom: 2px solid var(--border-color);
+        }
+        .ant-tabs-tab-active {
+          @apply border-t-1.5 theme-hover rounded-t-lg;
+          .ant-tabs-tab-btn {
+            @apply font-medium theme-text-first theme-hover;
+          }
+        }
+        .ant-tabs-ink-bar {
+          background: var(--button-bg-first);
+        }
+      }
+    }
+  }
+}
