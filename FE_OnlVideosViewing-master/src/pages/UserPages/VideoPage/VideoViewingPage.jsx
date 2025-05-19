@@ -5,6 +5,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { combineFullVideo, updateVideoView } from "../../../redux/reducers/videoReducer";
 import { getPlaylistInfo } from "../../../redux/reducers/playlistReducer";
 import { useNavigate } from "react-router-dom";
+import LikeButton from "../../../components/social/LikeButton";
+import CommentSection from "../../../components/social/CommentSection";
+import PlaylistManager from "../../../components/social/PlaylistManager";
 
 const baseURL = import.meta.env.VITE_BACKEND_BASEURL;
 
@@ -304,114 +307,109 @@ const VideoViewingPage = ({ videoId, userId, videoInfo, playlistId, loopMode }) 
     };
 
     return (
-        <div className="mx-auto">
-            <div ref={videoContainerRef} className="w-full">
-                <div className="relative w-full h-auto aspect-[16/9] overflow-hidden group rounded-md">
-                    {/* Video layers */}
-                    {initialVideoUrl && (
-                        <video
-                            ref={chunkVideoRef}
-                            src={initialVideoUrl}
-                            autoPlay
-                            onClick={handlePlayPause}
-                            className={`w-full h-full transition-opacity duration-0 ease-in-out cursor-pointer ${finalVideoUrl ? 'opacity-0 pointer-events-none hidden' : 'opacity-100'}`}
+        <div className="flex flex-col lg:flex-row gap-4 p-4">
+            <div className="lg:w-2/3">
+                <div className="relative aspect-video bg-black rounded-lg overflow-hidden">
+                    {/* Video player */}
+                    <video
+                        ref={chunkVideoRef}
+                        src={initialVideoUrl}
+                        poster={thumbnailUrl}
+                        className="w-full h-full"
+                        playsInline
+                        onPlay={() => setIsPlaying(true)}
+                        onPause={() => setIsPlaying(false)}
+                    />
+                    <video
+                        ref={finalVideoRef}
+                        src={finalVideoUrl}
+                        className="w-full h-full hidden"
+                        playsInline
+                        onPlay={() => setIsPlaying(true)}
+                        onPause={() => setIsPlaying(false)}
+                    />
+
+                    {/* Video controls */}
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+                        {/* Progress bar */}
+                        <input
+                            type="range"
+                            min="0"
+                            max={duration}
+                            value={currentTime}
+                            onChange={handleSeek}
+                            className="w-full h-1 bg-gray-600 rounded-lg appearance-none cursor-pointer"
                         />
-                    )}
-                    {finalVideoUrl && (
-                        <video
-                            ref={finalVideoRef}
-                            src={finalVideoUrl}
-                            autoPlay
-                            onClick={handlePlayPause}
-                            className={`w-full h-full transition-opacity duration-0 ease-in-out cursor-pointer ${finalVideoUrl ? 'opacity-100' : 'opacity-0'}`}
-                        />
-                    )}
 
-                    {/* Overlay buttons */}
-                    {!isEnded && !isPlaying && (
-                        <div
-                            className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-20 cursor-pointer"
-                            onClick={handlePlayPause}
-                        >
-                            <IoMdPlay className="text-white text-6xl hover:scale-105 transition-transform duration-300" />
-                        </div>
-                    )}
-                    {isEnded && shouldShowReplay && loopMode !== "one" && (
-                        <div
-                            className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-20 cursor-pointer"
-                            onClick={handleReplay}
-                        >
-                            <RiResetLeftFill className="text-white text-6xl hover:scale-105 transition-transform duration-300" />
-                        </div>
-                    )}
-
-                    {/* Controls - appear on hover */}
-                    <div className="absolute bottom-0 left-0 right-0 px-4 py-3 bg-[#0f0f0f75] bg-opacity-80 backdrop-blur-sm transition-all duration-300 opacity-0 translate-y-full group-hover:opacity-100 group-hover:translate-y-0 z-30">
-                        <div className="relative w-full h-1 rounded bg-gray-300">
-                            <input
-                                type="range"
-                                className="absolute w-full accent-red-600 h-1 z-10 cursor-pointer"
-                                min="0"
-                                max={duration}
-                                value={currentTime}
-                                onChange={handleSeek}
-                            />
-                            {!isSingleUrl && !finalVideoUrl && (
-                                <div
-                                    className="absolute top-0 h-1 z-20 bg-yellow-400 opacity-50 pointer-events-none rounded"
-                                    style={{
-                                        left: `${(30 / duration) * 100}%`,
-                                        right: 0,
-                                    }}
-                                />
-                            )}
-                        </div>
-
-                        <div className="flex justify-between items-center text-white mt-3">
-                            <div className="flex gap-4 items-center">
-                                {!isEnded ? (
-                                    <button onClick={handlePlayPause} className="text-xl hover:text-red-500 transition">
-                                        {isPlaying ? <IoMdPause /> : <IoMdPlay />}
-                                    </button>
-                                ) : (
-                                    <button onClick={handleReplay} className="text-xl hover:text-red-500 transition">
-                                        <RiResetLeftFill />
-                                    </button>
-                                )}
-                                <button onClick={handleMuteToggle} className="text-xl hover:text-red-500 transition">
-                                    {isMuted || volume === 0 ? <IoMdVolumeOff size={22} /> : <IoMdVolumeHigh size={22} />}
+                        <div className="flex items-center justify-between mt-2">
+                            <div className="flex items-center space-x-4">
+                                <button onClick={handlePlayPause}>
+                                    {isPlaying ? <IoMdPause size={24} /> : <IoMdPlay size={24} />}
+                                </button>
+                                <button onClick={handleMuteToggle}>
+                                    {isMuted ? <IoMdVolumeOff size={24} /> : <IoMdVolumeHigh size={24} />}
                                 </button>
                                 <input
                                     type="range"
                                     min="0"
                                     max="1"
-                                    step="0.01"
+                                    step="0.1"
                                     value={volume}
                                     onChange={handleVolumeChange}
-                                    className="accent-red-600 h-1 w-24 cursor-pointer"
+                                    className="w-20 h-1 bg-gray-600 rounded-lg appearance-none cursor-pointer"
                                 />
-                                <span className="text-sm text-gray-400">
+                                <span className="text-white">
                                     {formatTime(currentTime)} / {formatTime(duration)}
                                 </span>
                             </div>
-
-                            <div className="flex gap-2 items-center">
+                            <div className="flex items-center space-x-4">
                                 <select
                                     value={playbackRate}
                                     onChange={(e) => handleSpeedChange(parseFloat(e.target.value))}
-                                    className="bg-[#1f1f1f] text-sm rounded px-2 py-1 text-white border border-gray-600"
+                                    className="bg-transparent text-white"
                                 >
-                                    {[0.25, 0.5, 1, 1.25, 1.5, 2].map((rate) => (
-                                        <option key={rate} value={rate}>{rate}x</option>
-                                    ))}
+                                    <option value="0.5">0.5x</option>
+                                    <option value="1">1x</option>
+                                    <option value="1.5">1.5x</option>
+                                    <option value="2">2x</option>
                                 </select>
-                                <button onClick={handleFullscreenToggle} className="text-xl hover:text-red-500 transition">
-                                    {isFullscreen ? <RiFullscreenExitFill /> : <RiFullscreenFill />}
+                                <button onClick={handleFullscreenToggle}>
+                                    {isFullscreen ? <RiFullscreenExitFill size={24} /> : <RiFullscreenFill size={24} />}
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                {/* Video info and social features */}
+                <div className="mt-4 space-y-4">
+                    <div className="flex items-center justify-between">
+                        <h1 className="text-2xl font-bold">{videoInfo.title}</h1>
+                        <LikeButton videoId={videoId} />
+                    </div>
+                    <p className="text-gray-600">{videoInfo.description}</p>
+                    <div className="flex items-center space-x-4">
+                        <img
+                            src={videoInfo.uploader.avatar}
+                            alt={videoInfo.uploader.username}
+                            className="w-12 h-12 rounded-full"
+                        />
+                        <div>
+                            <h3 className="font-semibold">{videoInfo.uploader.username}</h3>
+                            <p className="text-sm text-gray-500">{videoInfo.views} views</p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Comments section */}
+                <div className="mt-8">
+                    <CommentSection videoId={videoId} />
+                </div>
+            </div>
+
+            {/* Right sidebar */}
+            <div className="lg:w-1/3">
+                <PlaylistManager videoId={videoId} />
             </div>
         </div>
     );
