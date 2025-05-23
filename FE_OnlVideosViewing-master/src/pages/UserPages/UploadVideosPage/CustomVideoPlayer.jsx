@@ -5,6 +5,8 @@ import { IoMdPause, IoMdPlay, IoMdVolumeHigh, IoMdVolumeOff } from 'react-icons/
 import { RiFullscreenExitFill, RiFullscreenFill, RiResetLeftFill } from 'react-icons/ri';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchVideoInfo, combineFullVideo, updateVideoView } from '../../../redux/reducers/videoReducer';
+import { isVideoOffline, getOfflineVideo } from '../../../services/offlineStorage';
+import { message } from 'antd';
 
 const baseURL = import.meta.env.VITE_BACKEND_BASEURL;
 
@@ -13,40 +15,60 @@ const CustomVideoPlayer = () => {
     const dispatch = useDispatch();
 
     const { videoInfo, videoUrls, loading } = useSelector((state) => state.video);
-    // const [videoInfo, setVideoInfo] = useState(null);
-
     const { isLoggedIn, userInfo } = useSelector((state) => state.auth.userLogin);
-
     const channelId = userInfo?.channel?._id;
 
     const [initialVideoUrl, setInitialVideoUrl] = useState(null);
     const [finalVideoUrl, setFinalVideoUrl] = useState(null);
-
     const [thumbnailUrl, setThumbnailUrl] = useState(null);
     const [hasStarted, setHasStarted] = useState(false);
-
     const [duration, setDuration] = useState(0);
     const [currentTime, setCurrentTime] = useState(0);
     const [isPlaying, setIsPlaying] = useState(true);
-
     const [isMuted, setIsMuted] = useState(false);
     const [volume, setVolume] = useState(0.5);
     const [previousVolume, setPreviousVolume] = useState(volume);
+    const [isFullscreen, setIsFullscreen] = useState(false);
+    const [playbackRate, setPlaybackRate] = useState(1);
+    const [isEnded, setIsEnded] = useState(false);
+    const [isSingleUrl, setIsSingleUrl] = useState(false);
+    const [isOffline, setIsOffline] = useState(false);
+    const [offlineVideoUrl, setOfflineVideoUrl] = useState(null);
 
     const videoContainerRef = useRef(null);
-    const [isFullscreen, setIsFullscreen] = useState(false);
-
-    const [playbackRate, setPlaybackRate] = useState(1);
-
-    const [isEnded, setIsEnded] = useState(false);
-
-    const [isSingleUrl, setIsSingleUrl] = useState(false);
     const chunkVideoRef = useRef(null);
     const finalVideoRef = useRef(null);
     const hasFetched = useRef(false);
     const hasIncrementedView = useRef(false);
 
     useEffect(() => {
+        checkOfflineStatus();
+    }, [videoId]);
+
+    const checkOfflineStatus = async () => {
+        try {
+            const offline = await isVideoOffline(videoId);
+            setIsOffline(offline);
+            
+            if (offline) {
+                const offlineVideo = await getOfflineVideo(videoId);
+                if (offlineVideo) {
+                    const url = URL.createObjectURL(offlineVideo.videoBlob);
+                    setOfflineVideoUrl(url);
+                    setDuration(offlineVideo.metadata.duration);
+                    setThumbnailUrl(offlineVideo.metadata.thumbnail);
+                    setIsSingleUrl(true);
+                }
+            } else {
+                loadOnlineVideo();
+            }
+        } catch (error) {
+            console.error('Error checking offline status:', error);
+            loadOnlineVideo();
+        }
+    };
+
+    const loadOnlineVideo = () => {
         if (videoId && !hasFetched.current) {
             hasFetched.current = true;
             dispatch(fetchVideoInfo(videoId))
@@ -68,63 +90,18 @@ const CustomVideoPlayer = () => {
                                 const streamUrl = `${baseURL}/video/stream-video?folderName=${folderName}&fileName=${fileName}`;
                                 setFinalVideoUrl(streamUrl);
                             })
-                            .catch((err) => console.error('Lỗi khi ghép video:', err));
+                            .catch((err) => {
+                                console.error('Error combining video:', err);
+                                message.error('Failed to load video');
+                            });
                     }
                 })
                 .catch((err) => {
-                    console.error('Lỗi khi tải video:', err);
+                    console.error('Error loading video:', err);
+                    message.error('Failed to load video');
                 });
         }
-    }, [dispatch, videoId]);
-
-    // useEffect(() => {
-    //     const fetchInitialData = async () => {
-    //         try {
-    //             const infoRes = await axios.get(`${baseURL}/video/get-video-info/${videoId}`);
-    //             const data = infoRes.data;
-    //             setVideoInfo(data);
-    //             setDuration(data.duration);
-    //             setThumbnailUrl(data.thumbnail);
-
-    //             const urls = data.url;
-
-    //             if (urls.length === 1) {
-    //                 setIsSingleUrl(true);
-    //                 setInitialVideoUrl(urls[0]);
-    //                 setFinalVideoUrl(null); // Không cần final video
-    //             } else {
-    //                 setIsSingleUrl(false);
-    //                 const firstUrl = data.url[0];
-    //                 setInitialVideoUrl(firstUrl);
-
-    //                 const combinedVideoData = await combineFullVideo(videoId);
-    //                 if (combinedVideoData) {
-    //                     const { folderName, fileName } = combinedVideoData;
-    //                     const streamUrl = `${baseURL}/video/stream-video?folderName=${folderName}&fileName=${fileName}`;
-    //                     setFinalVideoUrl(streamUrl);
-    //                 }
-    //             }
-    //         } catch (error) {
-    //             console.error('Lỗi khi tải video:', error);
-    //         }
-    //     };
-
-    //     const combineFullVideo = async (videoId) => {
-    //         try {
-    //             const videoRes = await axios.post(`${baseURL}/video/combine-video`, { videoId });
-    //             const { folderName, fileName } = videoRes.data;
-    //             return { folderName, fileName };
-    //         } catch (error) {
-    //             console.error('Lỗi khi ghép video:', error);
-    //             return null;
-    //         }
-    //     };
-
-    //     if (videoId && !hasFetched.current) {
-    //         hasFetched.current = true;
-    //         fetchInitialData();
-    //     }
-    // }, [videoId]);
+    };
 
     // Khi finalVideoUrl có, chuyển currentTime và ẩn video chunk
     useEffect(() => {
@@ -336,236 +313,109 @@ const CustomVideoPlayer = () => {
         return `${min}:${secStr}`;
     };
 
-    // return (
-    //     <div ref={videoContainerRef} className="flex flex-col items-center justify-center bg-black min-h-screen w-full">
-    //         <div className="relative w-full max-w-6xl aspect-video overflow-hidden">
-    //             {/* {thumbnailUrl && !hasStarted && (
-    //                 <img
-    //                     src={thumbnailUrl}
-    //                     alt="Thumbnail"
-    //                     className="absolute top-0 left-0 w-full h-full object-cover z-10"
-    //                 />
-    //             )} */}
-
-    //             {initialVideoUrl && (
-    //                 <video
-    //                     ref={chunkVideoRef}
-    //                     src={initialVideoUrl}
-    //                     autoPlay
-    //                     onClick={handlePlayPause}
-    //                     className={`w-full h-full transition-opacity duration-0 ease-in-out cursor-pointer ${finalVideoUrl ? 'opacity-0 pointer-events-none hidden' : 'opacity-100'}`}
-    //                 />
-    //             )}
-    //             {finalVideoUrl && (
-    //                 <video
-    //                     ref={finalVideoRef}
-    //                     src={finalVideoUrl}
-    //                     autoPlay
-    //                     onClick={handlePlayPause}
-    //                     className={`w-full h-full transition-opacity duration-0 ease-in-out cursor-pointer ${finalVideoUrl ? 'opacity-100' : 'opacity-0'}`}
-    //                 />
-    //             )}
-
-    //             {!isEnded && (
-    //                 !isPlaying && (
-    //                     <div
-    //                         className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-20 cursor-pointer"
-    //                         onClick={handlePlayPause}
-    //                     >
-    //                         <IoMdPlay className="text-white text-6xl hover:scale-105 transition-transform duration-300" />
-    //                     </div>
-    //                 )
-    //             )}
-
-    //             {isEnded && (
-    //                 <div
-    //                     className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-20 cursor-pointer"
-    //                     onClick={handleReplay}
-    //                 >
-    //                     <RiResetLeftFill className="text-white text-6xl hover:scale-105 transition-transform duration-300" />
-    //                 </div>
-    //             )}
-    //         </div>
-
-    //         {/* Controls */}
-    //         <div className="w-full max-w-6xl px-4 py-3 bg-[#0f0f0f] flex flex-col gap-3">
-    //             <div className="relative w-full h-1 rounded bg-gray-300">
-    //                 <input
-    //                     type="range"
-    //                     className="absolute w-full accent-red-600 h-1 z-10 cursor-pointer"
-    //                     min="0"
-    //                     max={duration}
-    //                     value={currentTime}
-    //                     onChange={handleSeek}
-    //                 />
-
-    //                 {!isSingleUrl && !finalVideoUrl && (
-    //                     <div
-    //                         className="absolute top-0 h-1 z-20 bg-yellow-400 opacity-50 pointer-events-none rounded"
-    //                         style={{
-    //                             left: `${(30 / duration) * 100}%`,
-    //                             right: 0,
-    //                         }}
-    //                     />
-    //                 )}
-    //             </div>
-
-    //             <div className="flex justify-between items-center text-white">
-    //                 <div className="flex gap-4 items-center">
-    //                     {!isEnded ? (
-    //                         <button onClick={handlePlayPause} className="text-xl hover:text-red-500 transition">
-    //                             {isPlaying ? <IoMdPause /> : <IoMdPlay />}
-    //                         </button>
-    //                     ) : (
-    //                         <button onClick={handleReplay} className="text-xl hover:text-red-500 transition">
-    //                             <RiResetLeftFill />
-    //                         </button>
-    //                     )}
-
-    //                     <button onClick={handleMuteToggle} className="text-xl hover:text-red-500 transition">
-    //                         {isMuted || volume === 0 ? <IoMdVolumeOff size={22} className="text-white" /> : <IoMdVolumeHigh size={22} className="text-white" />}
-    //                     </button>
-
-    //                     <input
-    //                         type="range"
-    //                         min="0"
-    //                         max="1"
-    //                         step="0.01"
-    //                         value={volume}
-    //                         onChange={handleVolumeChange}
-    //                         className="accent-red-600 h-1 w-24 cursor-pointer"
-    //                     />
-
-    //                     <span className="text-sm text-gray-400">
-    //                         {formatTime(currentTime)} / {formatTime(duration)}
-    //                     </span>
-    //                 </div>
-
-    //                 <div className="flex gap-2 items-center">
-    //                     <select
-    //                         value={playbackRate}
-    //                         onChange={(e) => handleSpeedChange(parseFloat(e.target.value))}
-    //                         className="bg-[#1f1f1f] text-sm rounded px-2 py-1 text-white border border-gray-600"
-    //                     >
-    //                         {[0.25, 0.5, 1, 1.25, 1.5, 2].map((rate) => (
-    //                             <option key={rate} value={rate}>{rate}x</option>
-    //                         ))}
-    //                     </select>
-
-    //                     <button onClick={handleFullscreenToggle} className="text-xl hover:text-red-500 transition">
-    //                         {isFullscreen ? <RiFullscreenExitFill /> : <RiFullscreenFill />}
-    //                     </button>
-    //                 </div>
-    //             </div>
-    //         </div>
-    //     </div>
-    // );
+    useEffect(() => {
+        return () => {
+            if (offlineVideoUrl) {
+                URL.revokeObjectURL(offlineVideoUrl);
+            }
+        };
+    }, [offlineVideoUrl]);
 
     return (
-        <div ref={videoContainerRef} className="flex flex-col items-center justify-center bg-black min-h-screen w-full">
-            <div className="relative w-full max-w-6xl aspect-video overflow-hidden group">
-                {/* Video layers */}
-                {initialVideoUrl && (
+        <div className="relative w-full" ref={videoContainerRef}>
+            {isOffline ? (
+                <video
+                    ref={chunkVideoRef}
+                    className="w-full"
+                    src={offlineVideoUrl}
+                    poster={thumbnailUrl}
+                    controls={false}
+                    onEnded={() => setIsEnded(true)}
+                />
+            ) : (
+                <>
                     <video
                         ref={chunkVideoRef}
+                        className={`w-full ${finalVideoUrl ? 'hidden' : ''}`}
                         src={initialVideoUrl}
-                        autoPlay
-                        onClick={handlePlayPause}
-                        className={`w-full h-full transition-opacity duration-0 ease-in-out cursor-pointer ${finalVideoUrl ? 'opacity-0 pointer-events-none hidden' : 'opacity-100'}`}
+                        poster={thumbnailUrl}
+                        controls={false}
+                        onEnded={() => setIsEnded(true)}
                     />
-                )}
-                {finalVideoUrl && (
-                    <video
-                        ref={finalVideoRef}
-                        src={finalVideoUrl}
-                        autoPlay
-                        onClick={handlePlayPause}
-                        className={`w-full h-full transition-opacity duration-0 ease-in-out cursor-pointer ${finalVideoUrl ? 'opacity-100' : 'opacity-0'}`}
+                    {finalVideoUrl && (
+                        <video
+                            ref={finalVideoRef}
+                            className="w-full"
+                            src={finalVideoUrl}
+                            controls={false}
+                            onEnded={() => setIsEnded(true)}
+                        />
+                    )}
+                </>
+            )}
+            
+            <div className="absolute bottom-0 left-0 right-0 px-4 py-3 bg-[#0f0f0f75] bg-opacity-80 backdrop-blur-sm transition-all duration-300 opacity-0 translate-y-full group-hover:opacity-100 group-hover:translate-y-0 z-30">
+                <div className="relative w-full h-1 rounded bg-gray-300">
+                    <input
+                        type="range"
+                        className="absolute w-full accent-red-600 h-1 z-10 cursor-pointer"
+                        min="0"
+                        max={duration}
+                        value={currentTime}
+                        onChange={handleSeek}
                     />
-                )}
+                    {!isSingleUrl && !finalVideoUrl && (
+                        <div
+                            className="absolute top-0 h-1 z-20 bg-yellow-400 opacity-50 pointer-events-none rounded"
+                            style={{
+                                left: `${(30 / duration) * 100}%`,
+                                right: 0,
+                            }}
+                        />
+                    )}
+                </div>
 
-                {/* Overlay buttons */}
-                {!isEnded && !isPlaying && (
-                    <div
-                        className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-20 cursor-pointer"
-                        onClick={handlePlayPause}
-                    >
-                        <IoMdPlay className="text-white text-6xl hover:scale-105 transition-transform duration-300" />
-                    </div>
-                )}
-                {isEnded && (
-                    <div
-                        className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-20 cursor-pointer"
-                        onClick={handleReplay}
-                    >
-                        <RiResetLeftFill className="text-white text-6xl hover:scale-105 transition-transform duration-300" />
-                    </div>
-                )}
-
-                {/* Controls - appear on hover */}
-                <div className="absolute bottom-0 left-0 right-0 px-4 py-3 bg-[#0f0f0f75] bg-opacity-80 backdrop-blur-sm transition-all duration-300 opacity-0 translate-y-full group-hover:opacity-100 group-hover:translate-y-0 z-30">
-                    <div className="relative w-full h-1 rounded bg-gray-300">
+                <div className="flex justify-between items-center text-white mt-3">
+                    <div className="flex gap-4 items-center">
+                        {!isEnded ? (
+                            <button onClick={handlePlayPause} className="text-xl hover:text-red-500 transition">
+                                {isPlaying ? <IoMdPause /> : <IoMdPlay />}
+                            </button>
+                        ) : (
+                            <button onClick={handleReplay} className="text-xl hover:text-red-500 transition">
+                                <RiResetLeftFill />
+                            </button>
+                        )}
+                        <button onClick={handleMuteToggle} className="text-xl hover:text-red-500 transition">
+                            {isMuted || volume === 0 ? <IoMdVolumeOff size={22} /> : <IoMdVolumeHigh size={22} />}
+                        </button>
                         <input
                             type="range"
-                            className="absolute w-full accent-red-600 h-1 z-10 cursor-pointer"
                             min="0"
-                            max={duration}
-                            value={currentTime}
-                            onChange={handleSeek}
+                            max="1"
+                            step="0.01"
+                            value={volume}
+                            onChange={handleVolumeChange}
+                            className="accent-red-600 h-1 w-24 cursor-pointer"
                         />
-                        {!isSingleUrl && !finalVideoUrl && (
-                            <div
-                                className="absolute top-0 h-1 z-20 bg-yellow-400 opacity-50 pointer-events-none rounded"
-                                style={{
-                                    left: `${(30 / duration) * 100}%`,
-                                    right: 0,
-                                }}
-                            />
-                        )}
+                        <span className="text-sm text-gray-400">
+                            {formatTime(currentTime)} / {formatTime(duration)}
+                        </span>
                     </div>
 
-                    <div className="flex justify-between items-center text-white mt-3">
-                        <div className="flex gap-4 items-center">
-                            {!isEnded ? (
-                                <button onClick={handlePlayPause} className="text-xl hover:text-red-500 transition">
-                                    {isPlaying ? <IoMdPause /> : <IoMdPlay />}
-                                </button>
-                            ) : (
-                                <button onClick={handleReplay} className="text-xl hover:text-red-500 transition">
-                                    <RiResetLeftFill />
-                                </button>
-                            )}
-                            <button onClick={handleMuteToggle} className="text-xl hover:text-red-500 transition">
-                                {isMuted || volume === 0 ? <IoMdVolumeOff size={22} /> : <IoMdVolumeHigh size={22} />}
-                            </button>
-                            <input
-                                type="range"
-                                min="0"
-                                max="1"
-                                step="0.01"
-                                value={volume}
-                                onChange={handleVolumeChange}
-                                className="accent-red-600 h-1 w-24 cursor-pointer"
-                            />
-                            <span className="text-sm text-gray-400">
-                                {formatTime(currentTime)} / {formatTime(duration)}
-                            </span>
-                        </div>
-
-                        <div className="flex gap-2 items-center">
-                            <select
-                                value={playbackRate}
-                                onChange={(e) => handleSpeedChange(parseFloat(e.target.value))}
-                                className="bg-[#1f1f1f] text-sm rounded px-2 py-1 text-white border border-gray-600"
-                            >
-                                {[0.25, 0.5, 1, 1.25, 1.5, 2].map((rate) => (
-                                    <option key={rate} value={rate}>{rate}x</option>
-                                ))}
-                            </select>
-                            <button onClick={handleFullscreenToggle} className="text-xl hover:text-red-500 transition">
-                                {isFullscreen ? <RiFullscreenExitFill /> : <RiFullscreenFill />}
-                            </button>
-                        </div>
+                    <div className="flex gap-2 items-center">
+                        <select
+                            value={playbackRate}
+                            onChange={(e) => handleSpeedChange(parseFloat(e.target.value))}
+                            className="bg-[#1f1f1f] text-sm rounded px-2 py-1 text-white border border-gray-600"
+                        >
+                            {[0.25, 0.5, 1, 1.25, 1.5, 2].map((rate) => (
+                                <option key={rate} value={rate}>{rate}x</option>
+                            ))}
+                        </select>
+                        <button onClick={handleFullscreenToggle} className="text-xl hover:text-red-500 transition">
+                            {isFullscreen ? <RiFullscreenExitFill /> : <RiFullscreenFill />}
+                        </button>
                     </div>
                 </div>
             </div>
