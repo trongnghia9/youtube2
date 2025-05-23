@@ -1,27 +1,38 @@
-import { BrowserRouter } from "react-router-dom";
-import AppRouter from "./routes/AppRouter";
-import { ThemeProvider } from "./services/ThemeContext";
-import { SocketProvider } from "./services/SocketContext";
-import { useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { loginGoogle } from "./redux/reducers/authReducer";
+import React from 'react';
+import { BrowserRouter as Router } from 'react-router-dom';
+import { ConfigProvider, theme } from 'antd';
+import { ThemeProvider } from './contexts/ThemeContext';
+import { useTheme } from './contexts/ThemeContext';
+import ThemeToggle from './components/ThemeToggle';
+import AppRoutes from './routes';
+import './styles/global.css';
 
-function App() {
-  const dispatch = useDispatch();
+const AppContent = () => {
+    const { isDarkMode } = useTheme();
 
-  useEffect(() => {
-    dispatch(loginGoogle());
-  }, [dispatch]);
+    return (
+        <ConfigProvider
+            theme={{
+                algorithm: isDarkMode ? theme.darkAlgorithm : theme.defaultAlgorithm,
+                token: {
+                    colorPrimary: '#1890ff',
+                },
+            }}
+        >
+            <Router>
+                <AppRoutes />
+                <ThemeToggle />
+            </Router>
+        </ConfigProvider>
+    );
+};
 
-  return (
-    <ThemeProvider>
-      <SocketProvider>
-        <BrowserRouter>
-          <AppRouter />
-        </BrowserRouter>
-      </SocketProvider>
-    </ThemeProvider>
-  );
-}
+const App = () => {
+    return (
+        <ThemeProvider>
+            <AppContent />
+        </ThemeProvider>
+    );
+};
 
 export default App;
